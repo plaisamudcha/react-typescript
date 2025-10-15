@@ -7,6 +7,9 @@ import Button from "./ui/Button";
 import Form from "./ui/Form";
 import Input from "./ui/Input";
 import z from "zod";
+import axios from "../config/axios";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 const signUpSchema = z
   .object({
@@ -51,15 +54,25 @@ export default function SignUpForm() {
     }
   };
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     const { success, data, error } = signUpSchema.safeParse(formInput);
 
     if (!success) {
       setFormError(z.flattenError(error).fieldErrors);
+      return;
     }
 
-    return data;
+    try {
+      await axios.post("/auth/signup", data);
+      toast.success("Account created successfully");
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        toast.error(err.response?.data.message);
+        return;
+      }
+      toast.error("Internal server error");
+    }
   };
 
   return (
