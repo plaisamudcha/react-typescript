@@ -1,5 +1,6 @@
 // import SignInForm from './SignInForm';
-import SignUpForm from './SignUpForm';
+import SignUpForm from "./SignUpForm";
+import SignInForm from "./SignInForm";
 
 export default function Guest() {
   return (
