@@ -15,7 +15,9 @@ export default function Guest() {
   return (
     <div className="flex flex-col gap-2 w-full">
       {mode === Mode.SIGN_IN && <SignInForm />}
-      {mode === Mode.SIGN_UP && <SignUpForm />}
+      {mode === Mode.SIGN_UP && (
+        <SignUpForm onSuccess={() => setMode(Mode.SIGN_IN)} />
+      )}
       <p className="text-center">
         {mode === Mode.SIGN_IN ? (
           <>

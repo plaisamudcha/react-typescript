@@ -1,15 +1,18 @@
 import { Slide, ToastContainer } from "react-toastify";
 import Container from "./components/Container";
+import { AuthContextProvider } from "./stores/AuthcontextProvider";
 
 function App() {
   return (
     <>
-      <Container />
-      <ToastContainer
-        autoClose={2000}
-        position="bottom-right"
-        transition={Slide}
-      />
+      <AuthContextProvider>
+        <Container />
+        <ToastContainer
+          autoClose={2000}
+          position="bottom-right"
+          transition={Slide}
+        />
+      </AuthContextProvider>
     </>
   );
 }

@@ -38,10 +38,14 @@ const initialInput: FormInput = {
   confirmPassword: "",
 };
 
+type SignUpFormProps = {
+  onSuccess: () => void;
+};
+
 // {email?: string[], password?: string[], confirmPassword?: string[]}
 type FormInputError = Partial<Record<keyof FormInput, string[]>>;
 
-export default function SignUpForm() {
+export default function SignUpForm({ onSuccess }: SignUpFormProps) {
   //   const [loading, setLoading] = useState<boolean>(false);
   const [formInput, setFormInput] = useState<FormInput>(initialInput);
   const [formError, setFormError] = useState<FormInputError>({});
@@ -49,9 +53,7 @@ export default function SignUpForm() {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     setFormError({});
     const { name, value } = e.target;
-    if (name) {
-      setFormInput((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormInput((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -66,6 +68,7 @@ export default function SignUpForm() {
     try {
       await axios.post("/auth/signup", data);
       toast.success("Account created successfully");
+      onSuccess();
     } catch (err) {
       if (err instanceof AxiosError) {
         toast.error(err.response?.data.message);
