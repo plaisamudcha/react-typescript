@@ -6,12 +6,28 @@ import {
 import Button from "./ui/Button";
 import Form from "./ui/Form";
 import Input from "./ui/Input";
+import z from "zod";
 
-type FormInput = {
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
+const signUpSchema = z
+  .object({
+    email: z.email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Confirm Password must be at least 6 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+// type FormInput = {
+//   email: string;
+//   password: string;
+//   confirmPassword: string;
+// };
+
+type FormInput = z.infer<typeof signUpSchema>;
 
 const initialInput: FormInput = {
   email: "",
@@ -19,11 +35,16 @@ const initialInput: FormInput = {
   confirmPassword: "",
 };
 
+// {email?: string[], password?: string[], confirmPassword?: string[]}
+type FormInputError = Partial<Record<keyof FormInput, string[]>>;
+
 export default function SignUpForm() {
   //   const [loading, setLoading] = useState<boolean>(false);
   const [formInput, setFormInput] = useState<FormInput>(initialInput);
+  const [formError, setFormError] = useState<FormInputError>({});
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setFormError({});
     const { name, value } = e.target;
     if (name) {
       setFormInput((prev) => ({ ...prev, [name]: value }));
@@ -32,6 +53,13 @@ export default function SignUpForm() {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
+    const { success, data, error } = signUpSchema.safeParse(formInput);
+
+    if (!success) {
+      setFormError(z.flattenError(error).fieldErrors);
+    }
+
+    return data;
   };
 
   return (
@@ -44,6 +72,11 @@ export default function SignUpForm() {
           id="email"
           onChange={handleChange}
         />
+        {formError.email && (
+          <>
+            <p className="text-red-500 text-sm">{formError.email[0]}</p>
+          </>
+        )}
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="password">Password</label>
@@ -54,6 +87,11 @@ export default function SignUpForm() {
           type="password"
           onChange={handleChange}
         />
+        {formError.password && (
+          <>
+            <p className="text-red-500 text-sm">{formError.password[0]}</p>
+          </>
+        )}
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="confirmPassword">Confirm password</label>
@@ -64,6 +102,13 @@ export default function SignUpForm() {
           type="password"
           onChange={handleChange}
         />
+        {formError.confirmPassword && (
+          <>
+            <p className="text-red-500 text-sm">
+              {formError.confirmPassword.join(", ")}
+            </p>
+          </>
+        )}
       </div>
       <div className="mt-2">
         <Button className="w-full">
