@@ -80,7 +80,7 @@ export default function SignUpForm() {
       <div className="flex flex-col gap-1">
         <label htmlFor="email">Email</label>
         <Input
-          placeholder="Enter Email"
+          placeholder="Enter email"
           name="email"
           id="email"
           onChange={handleChange}
